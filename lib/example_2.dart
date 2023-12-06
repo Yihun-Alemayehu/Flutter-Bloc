@@ -11,7 +11,7 @@ abstract class LoadAction {
 }
 
 @immutable
-abstract class LoadPersonsAction implements LoadAction {
+class LoadPersonsAction implements LoadAction {
   final PersonUrl url;
 
   const LoadPersonsAction({
@@ -76,7 +76,7 @@ class PersonsBloc extends Bloc<LoadAction, FetchData?> {
   final Map<PersonUrl, Iterable<Person>> _cache = {};
   PersonsBloc() : super(null) {
     on<LoadPersonsAction>(
-      (event, emit) {
+      (event, emit) async {
         final url = event.url;
         if (_cache.containsKey(url)) {
           final cachedPersons = _cache[url]!;
@@ -85,12 +85,22 @@ class PersonsBloc extends Bloc<LoadAction, FetchData?> {
             isRetrievedFromCache: true,
           );
           emit(result);
-        }else {
-          
+        } else {
+          final persons = await getPerson(url.urlString);
+          _cache[url] = persons;
+          final result = FetchData(
+            persons: persons,
+            isRetrievedFromCache: false,
+          );
+          emit(result);
         }
       },
     );
   }
+}
+
+extension Subscript<T> on Iterable<T> {
+  T? operator [](int index) => length > index ? elementAt(index) : null;
 }
 
 class ExampleTwo extends StatelessWidget {
@@ -98,7 +108,43 @@ class ExampleTwo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late final Bloc myBloc;
-    return const Scaffold();
+    //late final Bloc bloc;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('H O M E  P A G E'),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              TextButton(
+                onPressed: () {
+                  context.read<PersonsBloc>().add(
+                        const LoadPersonsAction(url: PersonUrl.person1),
+                      );
+                },
+                child: const Text('Load Person 1'),
+              ),
+              TextButton(
+                onPressed: () {
+                  context.read<PersonsBloc>().add(
+                        const LoadPersonsAction(url: PersonUrl.person2),
+                      );
+                },
+                child: const Text('Load Person 2'),
+              ),
+            ],
+          ),
+          BlocBuilder<PersonsBloc, FetchData?>(
+            buildWhen: (previous, current) {
+              
+            },
+            builder: (context, state) {
+              return Container();
+            },)
+        ],
+      ),
+    );
   }
 }

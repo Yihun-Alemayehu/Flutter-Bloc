@@ -1,12 +1,16 @@
 import 'package:bloc_practice/example_1.dart';
 import 'package:bloc_practice/example_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(
-    const MaterialApp(
+    MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ExampleTwo(),
+      home: BlocProvider(
+        create: (context) => PersonsBloc(),
+        child: const ExampleTwo(),
+      ),
     ),
   );
 }
