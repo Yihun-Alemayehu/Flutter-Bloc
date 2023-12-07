@@ -138,10 +138,25 @@ class ExampleTwo extends StatelessWidget {
           ),
           BlocBuilder<PersonsBloc, FetchData?>(
             buildWhen: (previous, current) {
-              
+              return previous?.persons != current?.persons;
             },
-            builder: (context, state) {
-              return Container();
+            builder: (context, fetchData) {
+              final persons = fetchData?.persons;
+              if(persons ==null){
+                return const SizedBox();
+              }
+              return Expanded(
+                child: ListView.builder(
+                  itemCount: persons.length,
+                  itemBuilder: (context, index) {
+                    final person = persons[index]!;
+                    return ListTile(
+                      title: Text(person.name),
+                    );
+                  },
+              
+                  ),
+              );
             },)
         ],
       ),
