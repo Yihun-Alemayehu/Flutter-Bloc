@@ -37,7 +37,7 @@ class FetchData {
 }
 
 class PersonsBloc extends Bloc<LoadAction, FetchData?> {
-  final Map<url, Iterable<Person>> _cache = {};
+  final Map<String, Iterable<Person>> _cache = {};
   PersonsBloc() : super(null) {
     on<LoadPersonsAction>(
       (event, emit) async {
@@ -50,7 +50,8 @@ class PersonsBloc extends Bloc<LoadAction, FetchData?> {
           );
           emit(result);
         } else {
-          final persons = await getPerson(url.urlString);
+          final loader = event.loader;
+          final persons = await loader(url);
           _cache[url] = persons;
           final result = FetchData(
             persons: persons,

@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bloc_practice/bloc/bloc_actions.dart';
+import 'package:bloc_practice/bloc/person.dart';
+import 'package:bloc_practice/bloc/persons_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-
-
-
-
-
 
 Future<Iterable<Person>> getPerson(String url) => HttpClient()
     .getUrl(Uri.parse(url))
@@ -16,10 +13,6 @@ Future<Iterable<Person>> getPerson(String url) => HttpClient()
     .then((res) => res.transform(utf8.decoder).join())
     .then((str) => jsonDecode(str) as List<dynamic>)
     .then((list) => list.map((e) => Person.fromJson(e)));
-
-
-
-
 
 extension Subscript<T> on Iterable<T> {
   T? operator [](int index) => length > index ? elementAt(index) : null;
@@ -43,7 +36,10 @@ class ExampleTwo extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   context.read<PersonsBloc>().add(
-                        const LoadPersonsAction(url: PersonUrl.person1),
+                        const LoadPersonsAction(
+                          loader: getPerson,
+                          url: person1Url,
+                        ),
                       );
                 },
                 child: const Text('Load Person 1'),
@@ -51,7 +47,10 @@ class ExampleTwo extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   context.read<PersonsBloc>().add(
-                        const LoadPersonsAction(url: PersonUrl.person2),
+                        const LoadPersonsAction(
+                          loader: getPerson,
+                          url: person2Url,
+                        ),
                       );
                 },
                 child: const Text('Load Person 2'),
