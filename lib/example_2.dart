@@ -4,37 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-@immutable
-abstract class LoadAction {
-  const LoadAction();
-}
-
-@immutable
-class LoadPersonsAction implements LoadAction {
-  final PersonUrl url;
-
-  const LoadPersonsAction({
-    required this.url,
-  }) : super();
-}
 
 
 
-enum PersonUrl {
-  person1,
-  person2,
-}
 
-extension UrlString on PersonUrl {
-  String get urlString {
-    switch (this) {
-      case PersonUrl.person1:
-        return 'http://127.0.0.1:5500/lib/src/res/api/person_1.json';
-      case PersonUrl.person2:
-        return 'http://127.0.0.1:5500/lib/src/res/api/person_2.json';
-    }
-  }
-}
+
 
 Future<Iterable<Person>> getPerson(String url) => HttpClient()
     .getUrl(Uri.parse(url))
@@ -43,47 +17,9 @@ Future<Iterable<Person>> getPerson(String url) => HttpClient()
     .then((str) => jsonDecode(str) as List<dynamic>)
     .then((list) => list.map((e) => Person.fromJson(e)));
 
-@immutable
-class FetchData {
-  final Iterable<Person> persons;
-  final bool isRetrievedFromCache;
 
-  const FetchData({
-    required this.persons,
-    required this.isRetrievedFromCache,
-  });
 
-  @override
-  String toString() =>
-      'FetchResult (isRetrievedFromCache = $isRetrievedFromCache , persons = $persons,)';
-}
 
-class PersonsBloc extends Bloc<LoadAction, FetchData?> {
-  final Map<PersonUrl, Iterable<Person>> _cache = {};
-  PersonsBloc() : super(null) {
-    on<LoadPersonsAction>(
-      (event, emit) async {
-        final url = event.url;
-        if (_cache.containsKey(url)) {
-          final cachedPersons = _cache[url]!;
-          final result = FetchData(
-            persons: cachedPersons,
-            isRetrievedFromCache: true,
-          );
-          emit(result);
-        } else {
-          final persons = await getPerson(url.urlString);
-          _cache[url] = persons;
-          final result = FetchData(
-            persons: persons,
-            isRetrievedFromCache: false,
-          );
-          emit(result);
-        }
-      },
-    );
-  }
-}
 
 extension Subscript<T> on Iterable<T> {
   T? operator [](int index) => length > index ? elementAt(index) : null;
