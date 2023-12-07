@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 @immutable
@@ -142,7 +141,7 @@ class ExampleTwo extends StatelessWidget {
             },
             builder: (context, fetchData) {
               final persons = fetchData?.persons;
-              if(persons ==null){
+              if (persons == null) {
                 return const SizedBox();
               }
               return Expanded(
@@ -154,13 +153,12 @@ class ExampleTwo extends StatelessWidget {
                       title: Text(person.name),
                     );
                   },
-              
-                  ),
+                ),
               );
-            },)
+            },
+          )
         ],
       ),
     );
   }
 }
-
